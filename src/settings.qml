@@ -1741,6 +1741,7 @@ import AndroidStatusBar 1.0
             
             property bool virtual_device_tacx: false
             property bool renpho_bike_knob_gears: false
+            property bool life_fitness_elliptical: false
         }
 
 
@@ -12376,6 +12377,21 @@ import AndroidStatusBar 1.0
                         Layout.alignment: Qt.AlignLeft | Qt.AlignTop
                         Layout.fillWidth: true
                         onClicked: { settings.gymstick_gx6_0_elliptical = checked; window.settings_restart_to_apply = true; }
+                    }
+
+                    IndicatorOnlySwitch {
+                        id: lifeFitnessEllipticalDelegate
+                        text: "Life Fitness is an Elliptical"
+                        spacing: 0
+                        bottomPadding: 0
+                        topPadding: 0
+                        rightPadding: 0
+                        leftPadding: 0
+                        clip: false
+                        checked: settings.life_fitness_elliptical
+                        Layout.alignment: Qt.AlignLeft | Qt.AlignTop
+                        Layout.fillWidth: true
+                        onClicked: { settings.life_fitness_elliptical = checked; window.settings_restart_to_apply = true; }
                     }
 
                     AccordionElement {
