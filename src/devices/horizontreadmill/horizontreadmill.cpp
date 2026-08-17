@@ -1629,6 +1629,24 @@ void horizontreadmill::characteristicChanged(const QLowEnergyCharacteristic &cha
         parseInclination(treadmillInclinationOverride((double)((uint8_t)newValue.at(63)) / 10.0));
         emit debug(QStringLiteral("Current Inclination: ") + QString::number(Inclination.value()));
 
+        // Horizon ellipticals (7.0 AE) send this same 0x12 frame but, unlike the treadmills,
+        // also report a usable cadence at byte 81. Confirmed against the console: the byte
+        // read 30 at 2.3 mph and 47 at 3.8 mph while the display showed 30-45 RPM, i.e. it is
+        // RPM directly with no scaling. It is a fixed-size 98-byte frame, but the branch above
+        // only guarantees >70 bytes, so the length is re-checked before indexing.
+        //
+        // Byte 81 was picked over the other effort-tracking bytes (71, 73) by how each one's
+        // ratio to speed behaves: a cadence stays LINEAR with speed because speed = cadence x
+        // stride, whereas power grows superlinearly. Byte 81's ratio is flat across the range
+        // (12.1-12.9), byte 73's climbs (4.5-10.2), which makes 73 the power field.
+        if (newValue.length() > 81) {
+            double cadence = (uint8_t)newValue.at(81);
+            if (cadence > 0 && cadence < 250) {
+                parseCadence(cadence);
+                emit debug(QStringLiteral("Current Cadence: ") + QString::number(Cadence.value()));
+            }
+        }
+
         if (firstDistanceCalculated && watts(weight))
             KCal +=
                 ((((0.048 * ((double)watts(weight)) +
